@@ -4,5 +4,7 @@ use clap::Parser;
 #[command(author, version, about, long_about = None)]
 pub struct Args {
     #[arg(short, long)]
-    filename: String,
+    filename: Option<String>,
+    #[arg(short, long)]
+    xml_file: Option<String>,
 }

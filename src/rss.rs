@@ -1,8 +1,10 @@
+extern crate skim;
+use skim::prelude::*;
 use std::{fs::File, io::BufReader};
 use xml::reader::{EventReader, XmlEvent};
 
-#[derive(Debug)]
-struct Item {
+#[derive(Debug, Clone)]
+pub struct Item {
     title: Option<String>,
     link: Option<String>,
     description: Option<String>,
@@ -61,6 +63,26 @@ impl Channel {
             }
         }
     }
+
+    pub fn select(&self) -> Item {
+        let options = SkimOptionsBuilder::default()
+            .height(Some("50%"))
+            .multi(false)
+            .select1(true)
+            .exit0(true)
+            .preview(Some("")) // preview should be specified to enable preview window
+            .build()
+            .unwrap();
+
+        let (tx_item, rx_item): (SkimItemSender, SkimItemReceiver) = unbounded();
+        self.items.iter().cloned().map(Arc::new).for_each(|x| {
+            let _ = tx_item.send(x);
+        });
+        drop(tx_item); // so that skim could know when to stop waiting for more items.
+
+        Skim::run_with(&options, Some(rx_item)).unwrap();
+        self.items[0].clone()
+    }
 }
 
 impl Item {
@@ -105,5 +127,31 @@ impl Item {
                 _ => {}
             }
         }
+    }
+}
+
+impl SkimItem for Item {
+    fn text(&self) -> Cow<str> {
+        self.title
+            .as_ref()
+            .unwrap_or(
+                self.description
+                    .as_ref()
+                    .expect("An item must have either title or description set"),
+            )
+            .into()
+    }
+
+    fn preview(&self, _context: PreviewContext) -> ItemPreview {
+        ItemPreview::AnsiText(
+            format!(
+                "{}\n{}\n{}\n{}",
+                self.title.as_ref().unwrap_or(&"".to_string()),
+                self.description.as_ref().unwrap_or(&"".to_string()),
+                self.link.as_ref().unwrap_or(&"".to_string()),
+                self.pub_date.as_ref().unwrap_or(&"".to_string())
+            )
+            .into(),
+        )
     }
 }
