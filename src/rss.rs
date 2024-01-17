@@ -1,6 +1,6 @@
 extern crate skim;
 use skim::prelude::*;
-use std::{fs::File, io::BufReader};
+use std::io::BufReader;
 use xml::reader::{EventReader, XmlEvent};
 
 #[derive(Debug, Clone)]
@@ -20,11 +20,8 @@ pub struct Channel {
 }
 
 impl Channel {
-    pub fn new(filename: &str) -> Result<Self, xml::reader::Error> {
-        let file = File::open(filename)?;
-        let file = BufReader::new(file);
-
-        let mut parser = EventReader::new(file);
+    pub fn new<R: std::io::Read>(reader: BufReader<R>) -> Result<Self, xml::reader::Error> {
+        let mut parser = EventReader::new(reader);
         let mut channel = Channel {
             title: String::new(),
             link: String::new(),
@@ -86,7 +83,9 @@ impl Channel {
 }
 
 impl Item {
-    fn new(parser: &mut EventReader<BufReader<File>>) -> Result<Item, xml::reader::Error> {
+    fn new<R: std::io::Read>(
+        parser: &mut EventReader<BufReader<R>>,
+    ) -> Result<Item, xml::reader::Error> {
         let mut item = Item {
             title: None,
             link: None,
