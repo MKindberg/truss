@@ -6,7 +6,7 @@ use xml::reader::{EventReader, XmlEvent};
 #[derive(Debug, Clone)]
 pub struct Item {
     title: Option<String>,
-    link: Option<String>,
+    pub link: Option<String>,
     description: Option<String>,
     pub_date: Option<String>,
 }
@@ -106,6 +106,15 @@ impl Item {
                 _ => {}
             }
         }
+    }
+    pub fn open(&self) {
+        if self.link.is_none() {
+            return;
+        }
+        let _ = std::process::Command::new("xdg-open")
+            .arg(self.link.as_ref().unwrap())
+            .output()
+            .expect("failed to open link in browser");
     }
 }
 

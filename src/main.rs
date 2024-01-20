@@ -14,12 +14,16 @@ fn main() -> std::io::Result<()> {
         let channels = parse_channels(reader.lines());
 
         let channel = picker::select(&channels);
-        let _item = picker::select(&channel.items);
+        let item = picker::select(&channel.items);
+
+        item.open();
     } else {
         let channels = parse_channels(std::io::stdin().lock().lines());
 
         let channel = picker::select(&channels);
-        let _item = picker::select(&channel.items);
+        let item = picker::select(&channel.items);
+
+        item.open();
     }
     Ok(())
 }
