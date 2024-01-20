@@ -34,6 +34,9 @@ fn parse_channels<B: BufRead>(lines: std::io::Lines<B>) -> Vec<rss::Channel> {
         let resp = reqwest::blocking::get(url.unwrap()).unwrap();
         let file = BufReader::new(resp);
         let channel = rss::Channel::new(file).expect("Failed to parse xml");
+        if channel.items.is_empty() {
+            continue;
+        }
         channels.push(channel);
     }
     channels

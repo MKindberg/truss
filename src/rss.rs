@@ -47,7 +47,11 @@ impl Channel {
                         }
                     }
                     "item" => {
-                        channel.items.push(Item::new(&mut parser)?);
+                        let i = Item::new(&mut parser)?;
+                        if i.title.is_none() && i.description.is_none() {
+                            continue;
+                        }
+                        channel.items.push(i);
                     }
                     _ => {}
                 },
@@ -122,11 +126,11 @@ impl SkimItem for Item {
     fn text(&self) -> Cow<str> {
         self.title
             .as_ref()
-            .unwrap_or(
+            .unwrap_or_else(|| {
                 self.description
                     .as_ref()
-                    .expect("An item must have either title or description set"),
-            )
+                    .expect("An item must have either title or description set")
+            })
             .into()
     }
 
