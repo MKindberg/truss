@@ -1,4 +1,5 @@
 extern crate skim;
+use colored::Colorize;
 use skim::prelude::*;
 use std::io::BufReader;
 use xml::reader::{EventReader, XmlEvent};
@@ -135,16 +136,24 @@ impl SkimItem for Item {
     }
 
     fn preview(&self, _context: PreviewContext) -> ItemPreview {
-        ItemPreview::AnsiText(
-            format!(
-                "{}\n{}\n{}\n{}",
-                self.title.as_ref().unwrap_or(&"".to_string()),
-                self.description.as_ref().unwrap_or(&"".to_string()),
-                self.link.as_ref().unwrap_or(&"".to_string()),
-                self.pub_date.as_ref().unwrap_or(&"".to_string())
-            )
-            .into(),
-        )
+        let mut str = "".to_string();
+        if let Some(title) = &self.title {
+            str += &title.underline();
+            str += "\n\n";
+        }
+        if let Some(description) = &self.description {
+            str += description;
+            str += "\n\n";
+        }
+        if let Some(link) = &self.link {
+            str += link;
+            str += "\n\n";
+        }
+        if let Some(pub_date) = &self.pub_date {
+            str += pub_date;
+            str += "\n\n";
+        }
+        ItemPreview::AnsiText(str.into())
     }
 }
 impl SkimItem for Channel {
@@ -154,7 +163,13 @@ impl SkimItem for Channel {
 
     fn preview(&self, _context: PreviewContext) -> ItemPreview {
         ItemPreview::AnsiText(
-            format!("{}\n{}\n{}", self.title, self.description, self.link,).into(),
+            format!(
+                "{}\n\n{}\n\n{}",
+                self.title.underline(),
+                self.description,
+                self.link,
+            )
+            .into(),
         )
     }
 }
