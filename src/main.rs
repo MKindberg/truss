@@ -12,6 +12,11 @@ fn main() -> std::io::Result<()> {
         let file = File::open(filename)?;
         let reader = BufReader::new(file);
         parse_channels(reader.lines())
+    } else if let Some(xml_file) = args.xml_file {
+        let file = File::open(xml_file)?;
+        let reader = BufReader::new(file);
+        let channel = rss::Channel::new(reader).expect("Failed to parse xml");
+        vec![channel]
     } else {
         parse_channels(std::io::stdin().lock().lines())
     };
