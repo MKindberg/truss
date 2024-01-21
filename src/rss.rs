@@ -33,17 +33,24 @@ impl Channel {
             match parser.next()? {
                 XmlEvent::StartElement { name, .. } => match name.local_name.as_str() {
                     "title" => {
-                        if let Ok(XmlEvent::Characters(s)) = parser.next() {
+                        let next = parser.next();
+                        if let Ok(XmlEvent::Characters(s)) = next {
+                            channel.title = s;
+                        } else if let Ok(XmlEvent::CData(s)) = next {
                             channel.title = s;
                         }
                     }
                     "link" => {
-                        if let Ok(XmlEvent::Characters(s)) = parser.next() {
+                        let next = parser.next();
+                        if let Ok(XmlEvent::Characters(s)) = next {
                             channel.link = s;
                         }
                     }
                     "description" => {
-                        if let Ok(XmlEvent::Characters(s)) = parser.next() {
+                        let next = parser.next();
+                        if let Ok(XmlEvent::Characters(s)) = next {
+                            channel.description = s;
+                        } else if let Ok(XmlEvent::CData(s)) = next {
                             channel.description = s;
                         }
                     }
@@ -82,7 +89,10 @@ impl Item {
             match parser.next()? {
                 XmlEvent::StartElement { name, .. } => match name.local_name.as_str() {
                     "title" => {
-                        if let Ok(XmlEvent::Characters(s)) = parser.next() {
+                        let next = parser.next();
+                        if let Ok(XmlEvent::Characters(s)) = next {
+                            item.title = Some(s);
+                        } else if let Ok(XmlEvent::CData(s)) = next {
                             item.title = Some(s);
                         }
                     }
@@ -92,7 +102,10 @@ impl Item {
                         }
                     }
                     "description" => {
-                        if let Ok(XmlEvent::Characters(s)) = parser.next() {
+                        let next = parser.next();
+                        if let Ok(XmlEvent::Characters(s)) = next {
+                            item.description = Some(s);
+                        } else if let Ok(XmlEvent::CData(s)) = next {
                             item.description = Some(s);
                         }
                     }
