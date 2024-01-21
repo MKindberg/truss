@@ -7,6 +7,7 @@ pub fn select<T: SkimItem + Clone>(items: &Vec<T>) -> T {
         .multi(false)
         .select1(true)
         .exit0(true)
+        .preview_window(Some("right:50%:wrap"))
         .preview(Some("")) // preview should be specified to enable preview window
         .build()
         .unwrap();
