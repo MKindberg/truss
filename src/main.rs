@@ -8,23 +8,17 @@ use std::{fs::File, io::BufReader};
 
 fn main() -> std::io::Result<()> {
     let args = args::Args::parse();
-    if let Some(filename) = args.filename {
+    let channels = if let Some(filename) = args.filename {
         let file = File::open(filename)?;
         let reader = BufReader::new(file);
-        let channels = parse_channels(reader.lines());
-
-        let channel = picker::select(&channels);
-        let item = picker::select(&channel.items);
-
-        item.open();
+        parse_channels(reader.lines())
     } else {
-        let channels = parse_channels(std::io::stdin().lock().lines());
+        parse_channels(std::io::stdin().lock().lines())
+    };
+    let channel = picker::select(&channels);
+    let item = picker::select(&channel.items);
 
-        let channel = picker::select(&channels);
-        let item = picker::select(&channel.items);
-
-        item.open();
-    }
+    item.open();
     Ok(())
 }
 

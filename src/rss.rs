@@ -138,15 +138,14 @@ impl SkimItem for Item {
     fn preview(&self, _context: PreviewContext) -> ItemPreview {
         let mut str = "".to_string();
         if let Some(title) = &self.title {
-            str += &title.underline();
-            str += "\n\n";
+            str += &format!("{}\n\n", title.underline());
         }
         if let Some(description) = &self.description {
             str += description;
             str += "\n\n";
         }
         if let Some(link) = &self.link {
-            str += link;
+            str += &link;
             str += "\n\n";
         }
         if let Some(pub_date) = &self.pub_date {
